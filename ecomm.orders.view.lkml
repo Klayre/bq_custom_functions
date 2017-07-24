@@ -10,6 +10,7 @@ view: order_items {
   dimension_group: created {
     type: time
     sql: TIMESTAMP(${TABLE}.created_at) ;;
+    convert_tz: no
   }
 
   dimension: delivered_at {
@@ -46,6 +47,7 @@ view: order_items {
   measure: total_revenue {
     type: sum
     sql: ${sale_price} ;;
+    value_format_name: decimal_1
   }
 
   dimension: shipped_at {
