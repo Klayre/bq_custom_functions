@@ -8,9 +8,13 @@ view: products {
   }
 
   dimension: brand {
-    type: string
     sql: ${TABLE}.brand ;;
-  }
+    link: {
+      label: "Brand Analytics Dashboard"
+      url: "/dashboards/944?Brand%20Name={{ value | encode_uri }}&Date={{
+      _filters['order_items.created_date'] | url_encode }}"
+      icon_url: "http://www.looker.com/favicon.ico"
+    }}
 
   measure: brand_list {
     type: list
