@@ -17,14 +17,29 @@ view: financial_data {
         field: financial_indicators.category
         value: "Prices and Inflation"
       }
+      filters: {
+        field: indicators_metadata.description
+        value: "Consumer Price Index for All Urban Consumers: All Items"
+      }
     }
   }
-  dimension: indicator_date {
-#     convert_tz: no
+#   dimension: indicator_date {
+#   }
+
+  dimension_group: indicator {
+    type: time
+    timeframes: [date, month, year]
+    sql: cast(${TABLE}.indicator_date as date) ;;
+    convert_tz: no
   }
-  dimension: next_indicator_date {}
+  dimension_group: next_indicator {
+    type: time
+    timeframes: [date, month, year]
+    sql:cast(${TABLE}.next_indicator_date as date) ;;
+    convert_tz: no
+  }
   dimension: primary_key {
-    sql: concat(cast((${indicator_date}) as string), ${description}) ;;
+    sql: concat(cast((${TABLE}.indicator_date) as string), ${description}) ;;
     primary_key: yes
   }
   dimension: description {}

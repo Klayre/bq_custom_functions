@@ -39,13 +39,17 @@ explore: order_items {
   }
   join: financial_data {
     sql_on:
-      ${order_items.created_year} >= cast(timestamp(${financial_data.indicator_date}) as date)
-      and ${financial_data.description} = 'Consumer Price Index for All Urban Consumers: All Items';;
-    type: left_outer
-    relationship: many_to_one
+      ${order_items.created_date} = ${financial_data.indicator_date}
+          ;;
+    type: inner
+    relationship: many_to_many
 
   }
 }
+#
+#  ${order_items.created_date} >=  ${financial_data.indicator_date}
+#       and ${order_items.created_date} <  ${financial_data.next_indicator_date}
+#       and ${financial_data.description} = 'Consumer Price Index for All Urban Consumers: All Items'
 
 #
 #       ${order_items.created_date} >= cast(timestamp(${financial_data.indicator_date}) as date)
