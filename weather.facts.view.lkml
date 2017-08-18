@@ -21,7 +21,7 @@ view: weather_facts_month {
   derived_table: {
     sql_trigger_value: select count(*) ;;
     explore_source: gsod {
-      column: zip_code { field: zipcode_station.zip_code }
+#       column: zip_code { field: users.zip_code }
       column: date_month {}
       column: total_precipitation {}
       filters: {
