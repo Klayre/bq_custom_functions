@@ -1,9 +1,15 @@
 connection: "bigquery_publicdata_standard_sql"
 
 include: "custom_functions.view"
+include: "products.view"
 
 explore: events {
   view_name: events
+  join: products {
+    view_label: "Products Visited"
+    sql_on: ${events.visited_product_id}=${products.id} ;;
+    relationship: one_to_many
+  }
 }
 
 view: events {
@@ -77,6 +83,11 @@ explore: sessions {
     sql: LEFT JOIN UNNEST(${sessions.products_visited}) as products_visited ;;
     relationship: one_to_many
   }
+  join: products {
+    view_label: "Products Visited"
+    sql_on: ${products_visited.product_id}=${products.id} ;;
+    relationship: one_to_many
+  }
 }
 view: sessions {
   derived_table: {
@@ -95,16 +106,18 @@ view: sessions {
     }
   }
   dimension: id {primary_key:yes}
-  dimension: events_fired {}
+  dimension: events_fired {hidden:yes}
   dimension_group: session {type:time  sql: ${TABLE}.session_time ;;}
   dimension: session_end_time {hidden:yes}
-  dimension: ip_addresses {}
+  dimension: ip_addresses {hidden:yes}
   dimension: user_id {}
-  dimension: products_visited {}
+  dimension: products_visited {hidden:yes}
   dimension: session_sequence {type:number}
   dimension: session_length {type:number
     sql: TIMESTAMP_DIFF(${session_end_time},${session_raw}, SECOND) ;;}
   dimension: session_length_tiered {type:tier  tiers: [0,60,120]  sql: ${session_length} ;;}
+  dimension: has_cancel {type:yesno
+    sql: (SELECT COUNT(*) FROM UNNEST(${events_fired}) ef WHERE ef.key='Cancel') > 0;;}
 
   measure: count_sessions {type:count  drill_fields:[session*]}
   measure: average_session_length {type:average  sql:${session_length};;}
@@ -112,13 +125,13 @@ view: sessions {
 }
 
 view: events_fired {
-  dimension: id { primary_key:yes sql: CONCAT(CAST(${sessions.id} as STRING), ${event_type}) ;; }
+  dimension: id { primary_key:yes hidden:yes sql: CONCAT(CAST(${sessions.id} as STRING), ${event_type}) ;; }
   dimension: event_type {sql: ${TABLE}.key;; }
   measure: times_fired {type:sum  sql: ${TABLE}.value ;;}
 }
 
 view: products_visited {
-  dimension: id { primary_key:yes sql: CONCAT(CAST(${sessions.id} as STRING), ${product_id}) ;; }
-  dimension: product_id {sql: ${TABLE}.key;; }
+  dimension: id { primary_key:yes hidden:yes sql: CONCAT(CAST(${sessions.id} as STRING), ${product_id}) ;; }
+  dimension: product_id {type:number  sql: CAST(${TABLE}.key AS INT64);; }
   measure: times_visited {type:sum  sql: ${TABLE}.value ;;}
 }
