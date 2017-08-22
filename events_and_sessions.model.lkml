@@ -34,7 +34,8 @@ view: events {
   dimension: zip {}
   dimension: visited_product_id {type:number sql: CAST(REGEXP_EXTRACT(${uri}, r'/product/(\d+)') AS INT64) ;; }
 
-  measure: count {type:count  drill_fields:[id, users.last_name, users.id, users.first_name]}
+  measure: count {type:count
+    drill_fields:[id, created_time, ip_address, users.id, uri, traffic_source ]}
 }
 
 #-----------------------------------------------------------------
@@ -107,6 +108,7 @@ view: sessions {
   }
   dimension: id {primary_key:yes}
   dimension: events_fired {hidden:yes}
+  dimension: event_types {sql: pairs_to_string(${events_fired},'decimal_0') ;;}
   dimension_group: session {type:time  sql: ${TABLE}.session_time ;;}
   dimension: session_end_time {hidden:yes}
   dimension: ip_addresses {hidden:yes}
@@ -121,7 +123,7 @@ view: sessions {
 
   measure: count_sessions {type:count  drill_fields:[session*]}
   measure: average_session_length {type:average  sql:${session_length};;}
-  set: session{ fields:[session_time, id, user_id]}
+  set: session{ fields:[session_time, id, user_id, event_types]}
 }
 
 view: events_fired {
