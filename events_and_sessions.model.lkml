@@ -56,7 +56,7 @@ view: events_for_sessionization {
     sql: pairs_count_distinct(ARRAY_AGG(STRUCT(${event_type} as key,CAST(${id} AS STRING) as value))) ;;}
 
   # parse the product_id out of the urls visited and how many times they were visited
-  measure: product_visited {
+  measure: products_visited {
     sql: pairs_count_distinct(ARRAY_AGG(
         CASE WHEN CAST(REGEXP_EXTRACT(${uri}, r'/product/(\d+)') AS INT64) IS NOT NULL
         THEN
@@ -94,7 +94,7 @@ view: sessions {
       column: session_end_time {field: events.max_time}
       column: ip_addresses {field: events.ip_addresses }
       column: user_id {field: events.user_id }
-      column: product_visited {field: events.product_visited}
+      column: products_visited {field: events.products_visited}
       derived_column: session_sequence {
         sql: ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY session_time) ;;
       }
