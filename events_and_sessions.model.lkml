@@ -26,6 +26,7 @@ view: events {
   dimension: uri {}
   dimension: user_id {type:number  sql: CAST(REGEXP_EXTRACT(${TABLE}.user_id, r'\d+') AS INT64) ;;}
   dimension: zip {}
+  dimension: visited_product_id {type:number sql: CAST(REGEXP_EXTRACT(${uri}, r'/product/(\d+)') AS INT64) ;; }
 
   measure: count {type:count  drill_fields:[id, users.last_name, users.id, users.first_name]}
 }
@@ -57,15 +58,8 @@ view: events_for_sessionization {
 
   # parse the product_id out of the urls visited and how many times they were visited
   measure: products_visited {
-    sql: pairs_count_distinct(ARRAY_AGG(
-        CASE WHEN CAST(REGEXP_EXTRACT(${uri}, r'/product/(\d+)') AS INT64) IS NOT NULL
-        THEN
-          STRUCT(
-            CAST(REGEXP_EXTRACT(${uri}, r'/product/(\d+)') AS STRING) as key,
-            CAST(${id} AS STRING) as value
-          )
-        END  IGNORE NULLS)) ;;
-  }
+    sql: pairs_count_distinct(ARRAY_AGG(STRUCT(CAST(${visited_product_id} as STRING) as key, CAST(${id} AS STRING) as value))) ;;}
+
 }
 
 #---------------------------------------------------------------------
