@@ -12,46 +12,22 @@ view: names {
   sql_table_name: `fh-bigquery.popular_names.usa_1910_2013`
     ;;
 
+  # Fields in the table
   dimension: name {}
   dimension: state {}
   dimension: gender {}
   dimension: year {type: number}
+  dimension: population {type:number  sql: CAST(${TABLE}.number AS FLOAT64) ;; }
 
-  dimension: decade {
-    type: number
-    sql: CAST(FLOOR(${year}/10)*10 AS INT64) ;;
-  }
+  # computed dimensions
+  dimension: decade {type:number  sql: CAST(FLOOR(${year}/10)*10 AS INT64) ;;}
+  dimension: first_letter {sql: SUBSTR(${name},1,1) ;;}
 
-  dimension: first_letter {
-    sql: SUBSTR(${name},1,1) ;;
-  }
+  # aggregate calculastions
+  measure: total_population {type:sum  sql: ${population} ;;
+    drill_fields:[state, gender, year, name, population]}
 
-  dimension: population {
-    type: number
-    sql: CAST(${TABLE}.number AS FLOAT64) ;;
-  }
-
-  measure: total_population {
-    type: sum
-    sql: ${population} ;;
-  }
-
-  set: detail {
-    fields: [state, gender, year, name, population]
-  }
-
-  measure: gender_balance {
-    type: string
-    sql:  pairs_sum_str(ARRAY_AGG(STRUCT(${gender} as key, ${population} as value)))  ;;
-  }
-
-  measure: gender_balance_graph {
-    type: string
-    sql:  pairs_sum_graph(ARRAY_AGG(STRUCT(${gender} as key, ${population} as value)))  ;;
-    html:
-    <img src="https://chart.googleapis.com/chart?chs=200x50&cht=p3&chf=bg,s,FFFFFF00&{{value}}">
-    ;;
-  }
+  # Top-N Measures
 
   measure: top_5_names {
     type: string
@@ -68,10 +44,7 @@ view: names {
     sql: pairs_sum_top_n(ARRAY_AGG(STRUCT(${state} as key, ${population} as value)), 5) ;;
   }
 
-  measure: median_year {
-    type: number
-    sql: MEDIAN_WEIGHTED(ARRAY_AGG(STRUCT(CAST(${year} as FLOAT64) as num, ${population} as weight)));;
-  }
+ # Graphs
 
   measure: decade_graph {
     type: string
@@ -95,5 +68,20 @@ view: names {
     ;;
 
     }
+
+  measure: gender_balance {
+    type: string
+    sql:  pairs_sum_str(ARRAY_AGG(STRUCT(${gender} as key, ${population} as value)))  ;;
+  }
+
+  measure: gender_balance_graph {
+    type: string
+    sql:  pairs_sum_graph(ARRAY_AGG(STRUCT(${gender} as key, ${population} as value)))  ;;
+    html:
+    <img src="https://chart.googleapis.com/chart?chs=200x50&cht=p3&chf=bg,s,FFFFFF00&{{value}}">
+    ;;
+  }
+
+
 
   }
