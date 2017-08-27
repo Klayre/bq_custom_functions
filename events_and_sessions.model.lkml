@@ -38,6 +38,11 @@ explore: sessions {
     sql: LEFT JOIN UNNEST(${sessions.events_fired}) as events_fired ;;
     relationship: one_to_many
   }
+  join: events_fired_2 {
+    from: events_fired
+    sql: LEFT JOIN UNNEST(${sessions.events_fired}) as events_fired_2 ;;
+    relationship: one_to_many
+  }
   join: products_visited {
     sql: LEFT JOIN UNNEST(${sessions.products_visited}) as products_visited ;;
     relationship: one_to_many
