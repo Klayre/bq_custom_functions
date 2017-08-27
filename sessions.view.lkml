@@ -12,6 +12,7 @@ view: sessions {
       column: user_id {field: events.user_id }
       column: products_visited {field: events.products_visited}
       column: categories_visited {field: events.categories_visited }
+      column: event_sequence {field: events.event_sequence}
       derived_column: session_sequence {
         sql: ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY session_time) ;;
       }
@@ -33,11 +34,12 @@ view: sessions {
   dimension: session_length_tiered {type:tier  tiers: [0,60,120]  sql: ${session_length} ;;}
   dimension: has_cancel {type:yesno
     sql: (SELECT COUNT(*) FROM UNNEST(${events_fired}) ef WHERE ef.key='Cancel') > 0;;}
+  dimension: event_sequence {}
 
   measure: count_sessions {type:count  drill_fields:[session*]}
   measure: average_session_length {type:average  sql:${session_length};;}
   measure: user_count {type:count_distinct  sql: ${user_id} ;; drill_fields:[user_id, count_sessions]}
-  set: session{ fields:[session_time, id, user_id, event_types]}
+  set: session{ fields:[session_time, id, user_id, event_sequence]}
 }
 
 view: events_fired {

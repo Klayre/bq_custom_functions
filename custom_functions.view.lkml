@@ -322,6 +322,21 @@ explore: pair_functions{
         pairs_to_string( pairs_top_n(pairs_convert_percentage(pairs_sum(a),'total'), n, true), 'percent_0' )
       ));
 
+      -- time series string
+      CREATE TEMP FUNCTION time_sequence(a ARRAY<STRUCT<ts TIMESTAMP, str STRING>>)
+      RETURNS string AS ((
+        SELECT
+          STRING_AGG(
+            CONCAT(CAST(t as STRING),':',str)
+            ,'|' ORDER BY t)
+        FROM (
+          SELECT
+            COALESCE(TIMESTAMP_DIFF(ts, LAG(ts,1) OVER (ORDER BY ts),SECOND),0) t
+            ,str
+          FROM
+            UNNEST(a)
+        )
+      ));
     ;;
 }
 

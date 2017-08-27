@@ -22,4 +22,6 @@ view: events_for_sessionization {
   measure: products_visited {
     sql: pairs_count_distinct(ARRAY_AGG(STRUCT(CAST(${visited_product_id} as STRING) as key, CAST(${id} AS STRING) as value))) ;;}
 
+  measure: event_sequence {
+    sql:  time_sequence(ARRAY_AGG(STRUCT(${created_raw} as ts, event_type as str))) ;;}
 }
