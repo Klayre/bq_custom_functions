@@ -19,6 +19,9 @@ explore: events {
 #-----------------------------------------------------------------
 #  Add some measures and dimension for sessionization.
 #-----------------------------------------------------------------
+#  This explore adds some aggregates for events so we can create a
+#    hypertree.  You shouldn't need to (or be able to) explore from
+#    here.
 
 explore: events_for_sessionization {
   label: "events_for_sessionization: INTERNAL USE ONLY"
