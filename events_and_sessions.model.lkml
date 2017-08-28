@@ -21,6 +21,8 @@ explore: events {
 #-----------------------------------------------------------------
 
 explore: events_for_sessionization {
+  label: "events_for_sessionization: INTERNAL USE ONLY"
+  hidden: yes
   from: events_for_sessionization
   extends: [events, custom_functions]
 }
