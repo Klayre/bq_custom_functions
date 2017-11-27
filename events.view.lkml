@@ -5,7 +5,9 @@ view: events {
   dimension: browser {}
   dimension: city {}
   dimension: country {}
-  dimension_group: created {type:time  sql: ${TABLE}.created_at ;;}
+  dimension_group: created {type:time  sql: ${TABLE}.created_at ;;
+    allow_fill:no
+    }
   dimension: event_type {}
   dimension: ip_address {}
   dimension: latitude {type:number}
