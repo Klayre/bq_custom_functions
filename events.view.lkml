@@ -24,6 +24,7 @@ view: events {
   dimension: visited_category {sql: REGEXP_EXTRACT(${uri}, r'/category/([^/]*)')  ;; }
 
   measure: event_count {type:count
+    label: "Count of Events"
     drill_fields:[id, created_time, ip_address, users.id, uri, traffic_source ]}
   measure: user_count {type:count_distinct  sql: ${user_id} ;; drill_fields:[user_id, event_count]}
 }
